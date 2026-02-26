@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function GoalsPage() {
-  const { goalPages, setGoalPages, addRecord } = useTempoStore();
+  const { goalPages, setGoalPages, addRecord, isLoaded } = useTempoStore();
   const [activePageIndex, setActivePageIndex] = useState(0);
   const [isNewGoalModalOpen, setIsNewGoalModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
@@ -22,6 +22,14 @@ export default function GoalsPage() {
   const { toast } = useToast();
 
   const activePage = goalPages[activePageIndex] || goalPages[0];
+
+  if (!isLoaded || !activePage) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh] text-muted-foreground animate-pulse">
+        <p className="uppercase tracking-widest text-xs">Loading Aspirations...</p>
+      </div>
+    );
+  }
 
   const addPage = () => {
     if (goalPages.length >= 5) return;
@@ -194,7 +202,6 @@ export default function GoalsPage() {
           <DialogHeader><DialogTitle className="flex items-center gap-2"><Clock className="w-5 h-5" /> Snapshot History</DialogTitle></DialogHeader>
           <div className="space-y-4 py-4">
             <p className="text-xs text-muted-foreground italic">Check the Archive 'Goals' folder for the full record list.</p>
-            {/* Logic to show history would go here, fetching from Archive filtered by folder 'Goals' */}
           </div>
         </DialogContent>
       </Dialog>
