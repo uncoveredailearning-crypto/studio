@@ -241,7 +241,7 @@ export default function InsightsPage() {
                     if (active && payload && payload.length) {
                       return (
                         <div className="bg-white p-3 border-none rounded-xl shadow-xl text-xs">
-                          <p className="font-bold font-code">{payload[0].value.toFixed(1)} hrs</p>
+                          <p className="font-bold font-code">{(payload[0].value as number).toFixed(1)} hrs</p>
                         </div>
                       );
                     }

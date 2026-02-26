@@ -99,6 +99,18 @@ export function useTempoStore() {
   const addRecord = (record: Omit<TimerRecord, 'id'>) => {
     const newRecord = { ...record, id: crypto.randomUUID() };
     setRecords(prev => [newRecord, ...prev]);
+
+    // Update goal progress if category matches
+    const hoursToAdd = record.duration / 3600;
+    setGoalPages(prevPages => prevPages.map(page => ({
+      ...page,
+      goals: page.goals.map(goal => {
+        if (goal.category === record.category || goal.title === record.category) {
+          return { ...goal, current: Number((goal.current + hoursToAdd).toFixed(2)) };
+        }
+        return goal;
+      })
+    })));
   };
 
   const deleteRecord = (id: string) => {
