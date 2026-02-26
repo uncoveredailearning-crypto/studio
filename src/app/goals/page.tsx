@@ -8,7 +8,7 @@ import { ChevronLeft, ChevronRight, Sparkles, Plus, Trash2, Edit2, History, Cloc
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useTempoStore, Goal, GoalPage } from "@/lib/store";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -168,7 +168,12 @@ export default function GoalsPage() {
 
       <Dialog open={isNewGoalModalOpen} onOpenChange={setIsNewGoalModalOpen}>
         <DialogContent className="rounded-3xl">
-          <DialogHeader><DialogTitle className="text-2xl font-bold">Define Goal</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Define Goal</DialogTitle>
+            <DialogDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">
+              Set a target for hours to track within a specific period.
+            </DialogDescription>
+          </DialogHeader>
           <div className="space-y-6 py-4">
             <div className="space-y-2">
               <Label className="text-xs uppercase font-bold tracking-wider">Goal Title</Label>
@@ -198,7 +203,12 @@ export default function GoalsPage() {
 
       <Dialog open={isHistoryModalOpen} onOpenChange={setIsHistoryModalOpen}>
         <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto rounded-3xl">
-          <DialogHeader><DialogTitle className="flex items-center gap-3 text-2xl font-bold"><Clock className="w-7 h-7 text-primary" /> Goal History</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3 text-2xl font-bold"><Clock className="w-7 h-7 text-primary" /> Goal History</DialogTitle>
+            <DialogDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">
+              Review your past progress snapshots and achievements.
+            </DialogDescription>
+          </DialogHeader>
           <div className="space-y-6 py-4">
             <p className="text-sm font-medium text-muted-foreground">Detailed logs are available in the Archive 'Goals' folder.</p>
           </div>

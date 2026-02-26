@@ -33,7 +33,8 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
+  DialogDescription
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon } from "lucide-react";
@@ -81,8 +82,6 @@ export default function InsightsPage() {
   const monthEnd = endOfMonth(currentMonthStart);
   const monthDays = eachDayOfInterval({ start: currentMonthStart, end: monthEnd });
   
-  // Calculate padding for the calendar grid based on the first day of the month
-  // We use weekStartsOn: 1 (Monday)
   const firstDayOfMonth = startOfMonth(currentMonthStart);
   const startDayPadding = (getDay(firstDayOfMonth) + 6) % 7;
   const paddingCells = Array.from({ length: startDayPadding });
@@ -277,7 +276,6 @@ export default function InsightsPage() {
               <div key={i} className="text-[10px] text-center font-black text-muted-foreground/40 py-2">{d}</div>
             ))}
             
-            {/* Empty padding cells for start of month */}
             {paddingCells.map((_, i) => (
               <div key={`padding-${i}`} className="aspect-square" />
             ))}
@@ -331,6 +329,9 @@ export default function InsightsPage() {
             <DialogTitle className="text-3xl font-extrabold tracking-tight pt-4">
               {selectedDay && format(selectedDay, "MMMM d")}
             </DialogTitle>
+            <DialogDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">
+              Detailed breakdown of sessions recorded on this day.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-6 max-h-[50vh] overflow-y-auto no-scrollbar">
             {dayDetailRecords.length === 0 ? (
@@ -361,7 +362,12 @@ export default function InsightsPage() {
 
       <Dialog open={isManualEntryOpen} onOpenChange={setIsManualEntryOpen}>
         <DialogContent className="rounded-[2.5rem]">
-          <DialogHeader><DialogTitle className="text-3xl font-extrabold tracking-tight pt-4">Retroactive Log</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle className="text-3xl font-extrabold tracking-tight pt-4">Retroactive Log</DialogTitle>
+            <DialogDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">
+              Add a past session manually to your activity records.
+            </DialogDescription>
+          </DialogHeader>
           <div className="space-y-6 py-6">
             <div className="space-y-2">
               <Label className="text-xs font-bold uppercase tracking-widest">Session Name</Label>

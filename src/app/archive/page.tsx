@@ -20,7 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useTempoStore, TimerRecord } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -194,7 +194,12 @@ export default function ArchivePage() {
 
       <Dialog open={!!editItem} onOpenChange={() => setEditItem(null)}>
         <DialogContent className="rounded-3xl">
-          <DialogHeader><DialogTitle className="text-2xl font-bold">Edit Session</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Edit Session</DialogTitle>
+            <DialogDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">
+              Update the name or category of this archived session.
+            </DialogDescription>
+          </DialogHeader>
           <form onSubmit={handleEdit} className="space-y-6 py-4">
             <div className="space-y-2">
               <Label className="text-xs uppercase font-bold tracking-wider">Session Name</Label>
@@ -211,7 +216,12 @@ export default function ArchivePage() {
 
       <Dialog open={!!moveItem} onOpenChange={() => setMoveItem(null)}>
         <DialogContent className="rounded-3xl">
-          <DialogHeader><DialogTitle className="text-2xl font-bold">Relocate Folder</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Relocate Folder</DialogTitle>
+            <DialogDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">
+              Select a new collection to move this session into.
+            </DialogDescription>
+          </DialogHeader>
           <div className="grid grid-cols-2 gap-3 py-6">
             {folders.map(f => (
               <Button key={f} variant="outline" className="justify-start h-14 rounded-xl font-bold hover:bg-primary hover:text-white transition-all" onClick={() => handleMove(f)}>{f}</Button>
@@ -222,7 +232,12 @@ export default function ArchivePage() {
 
       <Dialog open={isNewFolderModalOpen} onOpenChange={setIsNewFolderModalOpen}>
         <DialogContent className="rounded-3xl">
-          <DialogHeader><DialogTitle className="text-2xl font-bold">New Collection</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">New Collection</DialogTitle>
+            <DialogDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">
+              Create a new folder to organize your timed sessions.
+            </DialogDescription>
+          </DialogHeader>
           <div className="space-y-6 py-4">
             <Input placeholder="Folder name..." value={newFolderName} onChange={(e) => setNewFolderName(e.target.value)} className="h-14 bg-muted/30 border-none text-lg font-bold" />
             <Button className="w-full h-12 rounded-2xl font-bold" onClick={addFolder}>Create Folder</Button>

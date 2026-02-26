@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Plus, Play, Pause, RotateCcw, Save, Zap, Timer as TimerIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -83,6 +83,9 @@ export default function TimersPage() {
             <DialogContent className="sm:max-w-[425px] rounded-3xl">
               <DialogHeader>
                 <DialogTitle className="text-2xl font-bold">New Session</DialogTitle>
+                <DialogDescription className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">
+                  Configure your new tracking session details below.
+                </DialogDescription>
               </DialogHeader>
               <div className="grid gap-6 py-4">
                 <div className="space-y-2">
