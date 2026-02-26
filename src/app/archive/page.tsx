@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Search, FolderOpen, MoreHorizontal, ChevronDown, Trash2, Edit2, Share, Move, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { 
@@ -91,9 +92,14 @@ export default function ArchivePage() {
     <div className="space-y-6 fade-in">
       <header className="space-y-4">
         <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-4xl tracking-tight font-extrabold">Archive</h1>
-            <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest mt-1">Recorded History</p>
+          <div className="flex items-center gap-4">
+            <div className="relative w-12 h-12 rounded-2xl overflow-hidden shadow-lg shadow-primary/10">
+              <Image src="/icon.svg" alt="Tempo Logo" fill className="object-cover" />
+            </div>
+            <div>
+              <h1 className="text-4xl tracking-tight font-extrabold">Archive</h1>
+              <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest mt-1">Recorded History</p>
+            </div>
           </div>
           <Button variant="ghost" size="icon" className="rounded-2xl bg-muted/30" onClick={() => setIsNewFolderModalOpen(true)}>
             <Plus className="w-5 h-5" />

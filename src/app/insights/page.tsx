@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   BarChart, 
@@ -125,9 +126,14 @@ export default function InsightsPage() {
   return (
     <div className="space-y-8 fade-in pb-24">
       <header className="flex justify-between items-end">
-        <div>
-          <h1 className="text-4xl tracking-tight font-extrabold">Perspectives</h1>
-          <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest mt-1">Analytical Trends</p>
+        <div className="flex items-center gap-4">
+          <div className="relative w-12 h-12 rounded-2xl overflow-hidden shadow-lg shadow-primary/20">
+            <Image src="/icon.svg" alt="Tempo Logo" fill className="object-cover" />
+          </div>
+          <div>
+            <h1 className="text-4xl tracking-tight font-extrabold">Perspectives</h1>
+            <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest mt-1">Analytical Trends</p>
+          </div>
         </div>
         <Button size="icon" className="rounded-2xl shadow-xl shadow-primary/20 h-14 w-14 bg-primary text-primary-foreground" onClick={() => setIsManualEntryOpen(true)}>
           <Plus className="w-8 h-8" />
