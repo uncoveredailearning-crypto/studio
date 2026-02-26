@@ -26,7 +26,7 @@ export default function GoalsPage() {
   if (!isLoaded || !activePage) {
     return (
       <div className="flex items-center justify-center min-h-[60vh] text-muted-foreground animate-pulse">
-        <p className="uppercase tracking-widest text-xs">Loading Aspirations...</p>
+        <p className="uppercase tracking-widest text-xs font-bold">Loading Aspirations...</p>
       </div>
     );
   }
@@ -35,7 +35,7 @@ export default function GoalsPage() {
     if (goalPages.length >= 5) return;
     const newPage: GoalPage = {
       id: crypto.randomUUID(),
-      title: `Page ${goalPages.length + 1}`,
+      title: `Collection ${goalPages.length + 1}`,
       goals: []
     };
     setGoalPages([...goalPages, newPage]);
@@ -67,7 +67,7 @@ export default function GoalsPage() {
   const handleSnapshot = () => {
     activePage.goals.forEach(goal => {
       addRecord({
-        name: `Progress Snapshot: ${goal.title}`,
+        name: `Progress: ${goal.title}`,
         category: "Goals",
         duration: goal.current * 3600,
         date: new Date().toISOString().split('T')[0],
@@ -76,8 +76,8 @@ export default function GoalsPage() {
       });
     });
     toast({
-      title: "Snapshot Saved",
-      description: "Current goal progress logged to the Goals folder in Archive.",
+      title: "Snapshot Captured",
+      description: "Current goal progress logged to the Archive.",
     });
   };
 
@@ -85,47 +85,48 @@ export default function GoalsPage() {
     <div className="space-y-8 fade-in flex flex-col min-h-[calc(100vh-10rem)]">
       <header className="flex justify-between items-end">
         <div>
-          <h1 className="text-4xl font-headline italic tracking-tight">Aspirations</h1>
-          <p className="text-muted-foreground text-sm uppercase tracking-widest mt-1">Goal Trajectory</p>
+          <h1 className="text-4xl tracking-tight font-extrabold">Aspirations</h1>
+          <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest mt-1">Goal Trajectory</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="ghost" size="icon" onClick={() => setIsHistoryModalOpen(true)}>
+          <Button variant="ghost" size="icon" className="rounded-2xl bg-muted/30" onClick={() => setIsHistoryModalOpen(true)}>
             <History className="w-5 h-5" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={addPage} disabled={goalPages.length >= 5}>
+          <Button variant="ghost" size="icon" className="rounded-2xl bg-muted/30" onClick={addPage} disabled={goalPages.length >= 5}>
             <Plus className="w-5 h-5" />
           </Button>
           {goalPages.length > 1 && (
-            <Button variant="ghost" size="icon" className="text-destructive" onClick={deletePage}>
+            <Button variant="ghost" size="icon" className="text-destructive rounded-2xl bg-destructive/5" onClick={deletePage}>
               <Trash2 className="w-5 h-5" />
             </Button>
           )}
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col justify-center items-center gap-12 relative px-4">
+      <div className="flex-1 flex flex-col justify-center items-center gap-10 relative px-4">
         <div className="w-full text-center space-y-2">
-           <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Page {activePageIndex + 1} of {goalPages.length}</span>
-           <h2 className="text-3xl font-headline italic">{activePage.title}</h2>
+           <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">Page {activePageIndex + 1} of {goalPages.length}</span>
+           <h2 className="text-3xl font-bold tracking-tight">{activePage.title}</h2>
         </div>
 
-        <div className="w-full space-y-6">
+        <div className="w-full space-y-4">
           {activePage.goals.length === 0 ? (
-            <div className="p-12 text-center text-muted-foreground border-2 border-dashed rounded-xl">
-              No goals on this page.
+            <div className="p-16 text-center text-muted-foreground bg-muted/10 border-2 border-dashed border-muted rounded-[2rem]">
+              <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-10" />
+              <p className="font-bold uppercase tracking-widest text-[10px]">Empty Collection</p>
             </div>
           ) : (
             activePage.goals.map(goal => (
-              <Card key={goal.id} className="border-none shadow-none bg-muted/20">
+              <Card key={goal.id} className="border-none shadow-none bg-muted/30 rounded-3xl">
                 <CardContent className="p-6 space-y-4">
                   <div className="flex justify-between items-center">
-                    <h3 className="font-medium">{goal.title}</h3>
-                    <span className="text-[10px] uppercase tracking-widest bg-white px-2 py-0.5 rounded border">{goal.period}</span>
+                    <h3 className="font-bold text-lg">{goal.title}</h3>
+                    <span className="text-[10px] font-bold uppercase tracking-widest bg-accent text-accent-foreground px-3 py-1 rounded-full">{goal.period}</span>
                   </div>
-                  <Progress value={(goal.current / goal.target) * 100} className="h-1" />
-                  <div className="flex justify-between text-xs text-muted-foreground font-code">
-                    <span>{goal.current}h / {goal.target}h</span>
-                    <span>{Math.round((goal.current / goal.target) * 100)}%</span>
+                  <Progress value={(goal.current / goal.target) * 100} className="h-2 bg-white" />
+                  <div className="flex justify-between text-[11px] text-muted-foreground font-bold font-code uppercase">
+                    <span>{goal.current}h / {goal.target}h Achieved</span>
+                    <span className="text-primary">{Math.round((goal.current / goal.target) * 100)}%</span>
                   </div>
                 </CardContent>
               </Card>
@@ -136,28 +137,28 @@ export default function GoalsPage() {
         <div className="flex gap-4">
           <Button 
             variant="outline" size="icon" 
-            className="rounded-full h-12 w-12 border-border"
+            className="rounded-2xl h-14 w-14 border-border hover:bg-muted"
             onClick={() => setActivePageIndex(prev => (prev > 0 ? prev - 1 : goalPages.length - 1))}
           >
             <ChevronLeft className="w-6 h-6" />
           </Button>
           <Button 
-            className="rounded-full px-8 h-12 bg-primary text-primary-foreground shadow-lg gap-2"
+            className="rounded-2xl px-10 h-14 bg-primary text-primary-foreground shadow-xl shadow-primary/20 gap-3 font-bold text-lg"
             onClick={() => setIsNewGoalModalOpen(true)}
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-5 h-5" />
             Add Goal
           </Button>
           <Button 
-            className="rounded-full px-8 h-12 bg-accent text-accent-foreground shadow-lg gap-2"
+            className="rounded-2xl px-10 h-14 bg-accent text-accent-foreground shadow-xl shadow-accent/20 gap-3 font-bold text-lg"
             onClick={handleSnapshot}
           >
-            <Sparkles className="w-4 h-4" />
+            <Sparkles className="w-5 h-5" />
             Snapshot
           </Button>
           <Button 
             variant="outline" size="icon" 
-            className="rounded-full h-12 w-12 border-border"
+            className="rounded-2xl h-14 w-14 border-border hover:bg-muted"
             onClick={() => setActivePageIndex(prev => (prev < goalPages.length - 1 ? prev + 1 : 0))}
           >
             <ChevronRight className="w-6 h-6" />
@@ -165,43 +166,41 @@ export default function GoalsPage() {
         </div>
       </div>
 
-      {/* New Goal Modal */}
       <Dialog open={isNewGoalModalOpen} onOpenChange={setIsNewGoalModalOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Add New Goal</DialogTitle></DialogHeader>
-          <div className="space-y-4 py-4">
+        <DialogContent className="rounded-3xl">
+          <DialogHeader><DialogTitle className="text-2xl font-bold">Define Goal</DialogTitle></DialogHeader>
+          <div className="space-y-6 py-4">
             <div className="space-y-2">
-              <Label>Goal Name</Label>
-              <Input placeholder="E.g. Yoga Practice" value={newGoal.title} onChange={(e) => setNewGoal({...newGoal, title: e.target.value})} />
+              <Label className="text-xs uppercase font-bold tracking-wider">Goal Title</Label>
+              <Input placeholder="E.g. Yoga Practice" value={newGoal.title} onChange={(e) => setNewGoal({...newGoal, title: e.target.value})} className="h-12 bg-muted/30 border-none font-bold" />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label>Target Hours</Label>
-                <Input type="number" value={newGoal.target} onChange={(e) => setNewGoal({...newGoal, target: Number(e.target.value)})} />
+                <Label className="text-xs uppercase font-bold tracking-wider">Target Hours</Label>
+                <Input type="number" value={newGoal.target} onChange={(e) => setNewGoal({...newGoal, target: Number(e.target.value)})} className="h-12 bg-muted/30 border-none font-bold" />
               </div>
               <div className="space-y-2">
-                <Label>Period</Label>
+                <Label className="text-xs uppercase font-bold tracking-wider">Timeframe</Label>
                 <Select value={newGoal.period} onValueChange={(v) => setNewGoal({...newGoal, period: v as any})}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="daily">Daily</SelectItem>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                    <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectTrigger className="h-12 bg-muted/30 border-none font-bold rounded-xl"><SelectValue /></SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    <SelectItem value="daily" className="font-bold">Daily</SelectItem>
+                    <SelectItem value="weekly" className="font-bold">Weekly</SelectItem>
+                    <SelectItem value="monthly" className="font-bold">Monthly</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
-            <Button className="w-full" onClick={addGoal}>Add to {activePage.title}</Button>
+            <Button className="w-full h-14 rounded-2xl bg-primary text-lg font-bold" onClick={addGoal}>Add to Collection</Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* History Modal */}
       <Dialog open={isHistoryModalOpen} onOpenChange={setIsHistoryModalOpen}>
-        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
-          <DialogHeader><DialogTitle className="flex items-center gap-2"><Clock className="w-5 h-5" /> Snapshot History</DialogTitle></DialogHeader>
-          <div className="space-y-4 py-4">
-            <p className="text-xs text-muted-foreground italic">Check the Archive 'Goals' folder for the full record list.</p>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto rounded-3xl">
+          <DialogHeader><DialogTitle className="flex items-center gap-3 text-2xl font-bold"><Clock className="w-7 h-7 text-primary" /> Goal History</DialogTitle></DialogHeader>
+          <div className="space-y-6 py-4">
+            <p className="text-sm font-medium text-muted-foreground">Detailed logs are available in the Archive 'Goals' folder.</p>
           </div>
         </DialogContent>
       </Dialog>

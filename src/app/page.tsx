@@ -67,37 +67,37 @@ export default function TimersPage() {
     <div className="space-y-8 fade-in">
       <header className="flex justify-between items-end">
         <div>
-          <h1 className="text-4xl font-headline italic tracking-tight">Tempo</h1>
-          <p className="text-muted-foreground text-sm uppercase tracking-widest mt-1">Live Sessions</p>
+          <h1 className="text-4xl tracking-tight font-extrabold">Tempo</h1>
+          <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest mt-1">Live Sessions</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="icon" onClick={addSportsTimer} className="rounded-full h-12 w-12 border-accent/20 text-accent-foreground hover:bg-accent/10">
+          <Button variant="outline" size="icon" onClick={addSportsTimer} className="rounded-2xl h-12 w-12 border-accent/20 text-accent hover:bg-accent/10">
             <Zap className="w-5 h-5 fill-accent" />
           </Button>
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <DialogTrigger asChild>
-              <Button className="rounded-full h-12 w-12 bg-primary text-primary-foreground shadow-lg">
+              <Button className="rounded-2xl h-12 w-12 bg-primary text-primary-foreground shadow-lg shadow-primary/20">
                 <Plus className="w-6 h-6" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] rounded-3xl">
               <DialogHeader>
-                <DialogTitle className="font-headline text-2xl">New Regular Timer</DialogTitle>
+                <DialogTitle className="text-2xl font-bold">New Session</DialogTitle>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
+              <div className="grid gap-6 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input id="name" placeholder="Focus Session..." value={newTimer.name} onChange={(e) => setNewTimer({...newTimer, name: e.target.value})} />
+                  <Label htmlFor="name" className="text-xs uppercase font-bold tracking-wider">Session Name</Label>
+                  <Input id="name" placeholder="Focus Session..." value={newTimer.name} onChange={(e) => setNewTimer({...newTimer, name: e.target.value})} className="h-12 bg-muted/30 border-none focus-visible:ring-primary" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="category">Category</Label>
-                  <Input placeholder="Type category..." value={newTimer.category} onChange={(e) => setNewTimer({...newTimer, category: e.target.value})} />
-                  <div className="flex flex-wrap gap-1 mt-2">
+                  <Label htmlFor="category" className="text-xs uppercase font-bold tracking-wider">Category</Label>
+                  <Input placeholder="Type category..." value={newTimer.category} onChange={(e) => setNewTimer({...newTimer, category: e.target.value})} className="h-12 bg-muted/30 border-none focus-visible:ring-primary" />
+                  <div className="flex flex-wrap gap-1.5 mt-2">
                     {categories.slice(0, 4).map(c => (
                       <button 
                         key={c.name} 
                         onClick={() => setNewTimer({...newTimer, category: c.name})}
-                        className="text-[10px] uppercase px-2 py-1 bg-muted rounded hover:bg-muted/80 transition-colors"
+                        className="text-[10px] font-bold uppercase px-3 py-1.5 bg-muted rounded-full hover:bg-muted-foreground hover:text-white transition-all"
                       >
                         {c.name}
                       </button>
@@ -106,7 +106,7 @@ export default function TimersPage() {
                 </div>
               </div>
               <DialogFooter>
-                <Button onClick={addRegularTimer} className="w-full bg-primary">Create Timer</Button>
+                <Button onClick={addRegularTimer} className="w-full h-12 rounded-2xl bg-primary text-lg font-bold">Start Timer</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -115,10 +115,10 @@ export default function TimersPage() {
 
       <section className="space-y-4">
         {activeTimers.length === 0 ? (
-          <div className="h-64 flex flex-col items-center justify-center text-muted-foreground border-2 border-dashed border-border rounded-xl">
+          <div className="h-64 flex flex-col items-center justify-center text-muted-foreground bg-muted/20 border-2 border-dashed border-muted rounded-3xl">
             <TimerIcon className="w-12 h-12 opacity-20 mb-4" />
-            <p className="font-medium">No active timers</p>
-            <p className="text-xs uppercase tracking-tighter">Start your first session above</p>
+            <p className="font-bold">No active timers</p>
+            <p className="text-[10px] uppercase tracking-tighter font-bold">Start your first session above</p>
           </div>
         ) : (
           activeTimers.map((timer) => (
@@ -148,9 +148,7 @@ function TimerCard({ timer, onUpdate, onSave }: { timer: ActiveTimer; onUpdate: 
   };
 
   useEffect(() => {
-    // Initial display update
     setDisplayMs(calculateCurrentMs());
-
     if (timer.isRunning) {
       const step = timer.type === 'regular' ? 1000 : 10;
       intervalRef.current = setInterval(() => {
@@ -159,7 +157,6 @@ function TimerCard({ timer, onUpdate, onSave }: { timer: ActiveTimer; onUpdate: 
     } else {
       if (intervalRef.current) clearInterval(intervalRef.current);
     }
-
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
@@ -167,11 +164,9 @@ function TimerCard({ timer, onUpdate, onSave }: { timer: ActiveTimer; onUpdate: 
 
   const toggleTimer = () => {
     if (timer.isRunning) {
-      // Pause
       const newAccumulated = timer.accumulatedTime + (Date.now() - (timer.startTime || 0));
       onUpdate({ isRunning: false, accumulatedTime: newAccumulated, startTime: null });
     } else {
-      // Resume
       onUpdate({ isRunning: true, startTime: Date.now() });
     }
   };
@@ -197,28 +192,28 @@ function TimerCard({ timer, onUpdate, onSave }: { timer: ActiveTimer; onUpdate: 
   };
 
   return (
-    <Card className="border-border shadow-sm overflow-hidden group">
-      <CardContent className="p-6">
-        <div className="flex justify-between items-start mb-4">
+    <Card className="border-none bg-muted/30 shadow-none rounded-[2rem] overflow-hidden group">
+      <CardContent className="p-8">
+        <div className="flex justify-between items-start mb-6">
           <div>
-            <h3 className="font-semibold text-lg">{timer.name}</h3>
-            <span className="text-[10px] uppercase tracking-widest text-muted-foreground px-2 py-0.5 border border-border rounded-full">
+            <h3 className="font-bold text-xl">{timer.name}</h3>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground bg-white px-3 py-1 rounded-full border">
               {timer.category}
             </span>
           </div>
           <div className="flex gap-2">
-            <Button variant="ghost" size="icon" onClick={resetTimer} className="h-8 w-8">
-              <RotateCcw className="w-4 h-4" />
+            <Button variant="ghost" size="icon" onClick={resetTimer} className="h-10 w-10 hover:bg-white rounded-full">
+              <RotateCcw className="w-5 h-5 text-muted-foreground" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => onSave(calculateCurrentMs())} className="h-8 w-8 text-primary hover:bg-primary/10">
-              <Save className="w-4 h-4" />
+            <Button variant="ghost" size="icon" onClick={() => onSave(calculateCurrentMs())} className="h-10 w-10 text-primary hover:bg-primary/10 rounded-full">
+              <Save className="w-5 h-5" />
             </Button>
           </div>
         </div>
         
         <div className="flex items-center justify-between">
           <div className={cn(
-            "text-4xl font-code tabular-nums transition-colors duration-500",
+            "text-5xl font-bold tabular-nums tracking-tighter transition-colors duration-500",
             timer.isRunning ? "text-primary" : "text-muted-foreground"
           )}>
             {formatTime()}
@@ -226,11 +221,11 @@ function TimerCard({ timer, onUpdate, onSave }: { timer: ActiveTimer; onUpdate: 
           <Button 
             onClick={toggleTimer}
             className={cn(
-              "rounded-full h-14 w-14 shadow-md",
-              timer.isRunning ? "bg-white border border-primary text-primary hover:bg-primary/5" : "bg-primary text-primary-foreground"
+              "rounded-full h-16 w-16 shadow-xl",
+              timer.isRunning ? "bg-white border-2 border-primary text-primary hover:bg-primary/5" : "bg-primary text-primary-foreground"
             )}
           >
-            {timer.isRunning ? <Pause className="w-6 h-6 fill-primary" /> : <Play className="w-6 h-6 fill-current" />}
+            {timer.isRunning ? <Pause className="w-8 h-8 fill-primary" /> : <Play className="w-8 h-8 fill-current" />}
           </Button>
         </div>
       </CardContent>
