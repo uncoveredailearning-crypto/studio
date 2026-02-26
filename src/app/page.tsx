@@ -26,7 +26,7 @@ export default function TimersPage() {
     }
     addCategory(newTimer.category);
     const timer = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       name: newTimer.name,
       category: newTimer.category,
       type: "regular",
@@ -40,7 +40,7 @@ export default function TimersPage() {
 
   const addSportsTimer = () => {
     const timer = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       name: "Sports Timer",
       category: "Sports",
       type: "sports",

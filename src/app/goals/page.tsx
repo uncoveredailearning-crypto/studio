@@ -34,7 +34,7 @@ export default function GoalsPage() {
   const addPage = () => {
     if (goalPages.length >= 5) return;
     const newPage: GoalPage = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       title: `Page ${goalPages.length + 1}`,
       goals: []
     };
@@ -51,7 +51,7 @@ export default function GoalsPage() {
   const addGoal = () => {
     if (!newGoal.title || !newGoal.target) return;
     const goal: Goal = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       title: newGoal.title,
       target: newGoal.target,
       period: newGoal.period as any,

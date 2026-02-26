@@ -83,7 +83,7 @@ export function useTempoStore() {
   }, [records, goalPages, folders, categories, isLoaded]);
 
   const addRecord = (record: Omit<TimerRecord, 'id'>) => {
-    const newRecord = { ...record, id: Date.now().toString() };
+    const newRecord = { ...record, id: crypto.randomUUID() };
     setRecords(prev => [newRecord, ...prev]);
   };
 
