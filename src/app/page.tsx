@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect, useRef } from "react";
 import { Plus, Play, Pause, RotateCcw, Save, Zap, Timer as TimerIcon } from "lucide-react";
@@ -8,16 +8,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { useTempoStore } from "@/lib/store";
+import { useTempoStore, ActiveTimer } from "@/lib/store";
 
 export default function TimersPage() {
-  const { addRecord, addCategory, categories } = useTempoStore();
-  const [activeTimers, setActiveTimers] = useState<any[]>([]);
+  const { addRecord, addCategory, categories, activeTimers, addActiveTimer, deleteActiveTimer, updateActiveTimer, isLoaded } = useTempoStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTimer, setNewTimer] = useState({ name: "", category: "Work" });
   const { toast } = useToast();
+
+  if (!isLoaded) return null;
 
   const addRegularTimer = () => {
     if (!newTimer.name) {
@@ -25,43 +25,41 @@ export default function TimersPage() {
       return;
     }
     addCategory(newTimer.category);
-    const timer = {
-      id: crypto.randomUUID(),
+    addActiveTimer({
       name: newTimer.name,
       category: newTimer.category,
       type: "regular",
-      seconds: 0,
-      isRunning: false,
-    };
-    setActiveTimers([timer, ...activeTimers]);
+      accumulatedTime: 0,
+      startTime: Date.now(),
+      isRunning: true,
+    });
     setIsModalOpen(false);
     setNewTimer({ name: "", category: "Work" });
   };
 
   const addSportsTimer = () => {
-    const timer = {
-      id: crypto.randomUUID(),
+    addActiveTimer({
       name: "Sports Timer",
       category: "Sports",
       type: "sports",
-      ms: 0,
+      accumulatedTime: 0,
+      startTime: Date.now(),
       isRunning: true,
-    };
-    setActiveTimers([timer, ...activeTimers]);
+    });
     toast({ title: "Sports timer started" });
   };
 
-  const handleSave = (id: string, data: any) => {
+  const handleSave = (timer: ActiveTimer, currentMs: number) => {
     addRecord({
-      name: data.name,
-      category: data.category,
-      duration: data.type === 'regular' ? data.time : Math.floor(data.time / 1000),
-      ms: data.type === 'sports' ? data.time : undefined,
+      name: timer.name,
+      category: timer.category,
+      duration: Math.floor(currentMs / 1000),
+      ms: timer.type === 'sports' ? currentMs : undefined,
       date: new Date().toISOString().split('T')[0],
       folder: 'Unsorted',
-      type: data.type,
+      type: timer.type,
     });
-    setActiveTimers(prev => prev.filter(t => t.id !== id));
+    deleteActiveTimer(timer.id);
     toast({ title: "Session saved to Archive" });
   };
 
@@ -127,8 +125,8 @@ export default function TimersPage() {
             <TimerCard 
               key={timer.id} 
               timer={timer} 
-              onDelete={() => setActiveTimers(activeTimers.filter(t => t.id !== timer.id))}
-              onSave={(time) => handleSave(timer.id, { ...timer, time })}
+              onUpdate={(updates) => updateActiveTimer(timer.id, updates)}
+              onSave={(currentMs) => handleSave(timer, currentMs)}
             />
           ))
         )}
@@ -137,35 +135,63 @@ export default function TimersPage() {
   );
 }
 
-function TimerCard({ timer, onDelete, onSave }: { timer: any; onDelete: () => void; onSave: (time: number) => void }) {
-  const [time, setTime] = useState(timer.type === 'regular' ? timer.seconds : timer.ms);
-  const [isRunning, setIsRunning] = useState(timer.isRunning);
+function TimerCard({ timer, onUpdate, onSave }: { timer: ActiveTimer; onUpdate: (updates: Partial<ActiveTimer>) => void; onSave: (ms: number) => void }) {
+  const [displayMs, setDisplayMs] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  const calculateCurrentMs = () => {
+    let current = timer.accumulatedTime;
+    if (timer.isRunning && timer.startTime) {
+      current += (Date.now() - timer.startTime);
+    }
+    return current;
+  };
+
   useEffect(() => {
-    if (isRunning) {
+    // Initial display update
+    setDisplayMs(calculateCurrentMs());
+
+    if (timer.isRunning) {
       const step = timer.type === 'regular' ? 1000 : 10;
       intervalRef.current = setInterval(() => {
-        setTime((prev: number) => prev + (timer.type === 'regular' ? 1 : 10));
+        setDisplayMs(calculateCurrentMs());
       }, step);
-    } else if (intervalRef.current) {
-      clearInterval(intervalRef.current);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
     }
+
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isRunning, timer.type]);
+  }, [timer.isRunning, timer.accumulatedTime, timer.startTime]);
+
+  const toggleTimer = () => {
+    if (timer.isRunning) {
+      // Pause
+      const newAccumulated = timer.accumulatedTime + (Date.now() - (timer.startTime || 0));
+      onUpdate({ isRunning: false, accumulatedTime: newAccumulated, startTime: null });
+    } else {
+      // Resume
+      onUpdate({ isRunning: true, startTime: Date.now() });
+    }
+  };
+
+  const resetTimer = () => {
+    onUpdate({ accumulatedTime: 0, startTime: timer.isRunning ? Date.now() : null });
+    setDisplayMs(0);
+  };
 
   const formatTime = () => {
+    const totalS = Math.floor(displayMs / 1000);
     if (timer.type === 'regular') {
-      const h = Math.floor(time / 3600).toString().padStart(2, '0');
-      const m = Math.floor((time % 3600) / 60).toString().padStart(2, '0');
-      const s = (time % 60).toString().padStart(2, '0');
+      const h = Math.floor(totalS / 3600).toString().padStart(2, '0');
+      const m = Math.floor((totalS % 3600) / 60).toString().padStart(2, '0');
+      const s = (totalS % 60).toString().padStart(2, '0');
       return `${h}:${m}:${s}`;
     } else {
-      const m = Math.floor(time / 60000).toString().padStart(2, '0');
-      const s = Math.floor((time % 60000) / 1000).toString().padStart(2, '0');
-      const ms = Math.floor((time % 1000) / 10).toString().padStart(2, '0');
+      const m = Math.floor(displayMs / 60000).toString().padStart(2, '0');
+      const s = Math.floor((displayMs % 60000) / 1000).toString().padStart(2, '0');
+      const ms = Math.floor((displayMs % 1000) / 10).toString().padStart(2, '0');
       return `${m}:${s}.${ms}`;
     }
   };
@@ -181,10 +207,10 @@ function TimerCard({ timer, onDelete, onSave }: { timer: any; onDelete: () => vo
             </span>
           </div>
           <div className="flex gap-2">
-            <Button variant="ghost" size="icon" onClick={() => setTime(0)} className="h-8 w-8">
+            <Button variant="ghost" size="icon" onClick={resetTimer} className="h-8 w-8">
               <RotateCcw className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => onSave(time)} className="h-8 w-8 text-primary hover:bg-primary/10">
+            <Button variant="ghost" size="icon" onClick={() => onSave(calculateCurrentMs())} className="h-8 w-8 text-primary hover:bg-primary/10">
               <Save className="w-4 h-4" />
             </Button>
           </div>
@@ -193,18 +219,18 @@ function TimerCard({ timer, onDelete, onSave }: { timer: any; onDelete: () => vo
         <div className="flex items-center justify-between">
           <div className={cn(
             "text-4xl font-code tabular-nums transition-colors duration-500",
-            isRunning ? "text-primary" : "text-muted-foreground"
+            timer.isRunning ? "text-primary" : "text-muted-foreground"
           )}>
             {formatTime()}
           </div>
           <Button 
-            onClick={() => setIsRunning(!isRunning)}
+            onClick={toggleTimer}
             className={cn(
               "rounded-full h-14 w-14 shadow-md",
-              isRunning ? "bg-white border border-primary text-primary hover:bg-primary/5" : "bg-primary text-primary-foreground"
+              timer.isRunning ? "bg-white border border-primary text-primary hover:bg-primary/5" : "bg-primary text-primary-foreground"
             )}
           >
-            {isRunning ? <Pause className="w-6 h-6 fill-primary" /> : <Play className="w-6 h-6 fill-current" />}
+            {timer.isRunning ? <Pause className="w-6 h-6 fill-primary" /> : <Play className="w-6 h-6 fill-current" />}
           </Button>
         </div>
       </CardContent>

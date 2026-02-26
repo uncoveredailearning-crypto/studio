@@ -7,6 +7,16 @@ export type Category = {
   color: string;
 };
 
+export type ActiveTimer = {
+  id: string;
+  name: string;
+  category: string;
+  type: 'regular' | 'sports';
+  accumulatedTime: number; // in ms
+  startTime: number | null; // timestamp when started
+  isRunning: boolean;
+};
+
 export type TimerRecord = {
   id: string;
   name: string;
@@ -44,6 +54,7 @@ export const DEFAULT_CATEGORIES: Category[] = [
 
 export function useTempoStore() {
   const [records, setRecords] = useState<TimerRecord[]>([]);
+  const [activeTimers, setActiveTimers] = useState<ActiveTimer[]>([]);
   const [goalPages, setGoalPages] = useState<GoalPage[]>([]);
   const [folders, setFolders] = useState<string[]>(['Unsorted', 'Work', 'Personal', 'Health']);
   const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
@@ -51,11 +62,13 @@ export function useTempoStore() {
 
   useEffect(() => {
     const savedRecords = localStorage.getItem('tempo_records');
+    const savedActiveTimers = localStorage.getItem('tempo_active_timers');
     const savedGoalPages = localStorage.getItem('tempo_goal_pages');
     const savedFolders = localStorage.getItem('tempo_folders');
     const savedCategories = localStorage.getItem('tempo_categories');
 
     if (savedRecords) setRecords(JSON.parse(savedRecords));
+    if (savedActiveTimers) setActiveTimers(JSON.parse(savedActiveTimers));
     if (savedGoalPages) {
       setGoalPages(JSON.parse(savedGoalPages));
     } else {
@@ -76,11 +89,12 @@ export function useTempoStore() {
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem('tempo_records', JSON.stringify(records));
+      localStorage.setItem('tempo_active_timers', JSON.stringify(activeTimers));
       localStorage.setItem('tempo_goal_pages', JSON.stringify(goalPages));
       localStorage.setItem('tempo_folders', JSON.stringify(folders));
       localStorage.setItem('tempo_categories', JSON.stringify(categories));
     }
-  }, [records, goalPages, folders, categories, isLoaded]);
+  }, [records, activeTimers, goalPages, folders, categories, isLoaded]);
 
   const addRecord = (record: Omit<TimerRecord, 'id'>) => {
     const newRecord = { ...record, id: crypto.randomUUID() };
@@ -95,6 +109,19 @@ export function useTempoStore() {
     setRecords(prev => prev.map(r => r.id === id ? { ...r, ...updates } : r));
   };
 
+  const addActiveTimer = (timer: Omit<ActiveTimer, 'id'>) => {
+    const newTimer = { ...timer, id: crypto.randomUUID() };
+    setActiveTimers(prev => [newTimer, ...prev]);
+  };
+
+  const deleteActiveTimer = (id: string) => {
+    setActiveTimers(prev => prev.filter(t => t.id !== id));
+  };
+
+  const updateActiveTimer = (id: string, updates: Partial<ActiveTimer>) => {
+    setActiveTimers(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t));
+  };
+
   const addCategory = (name: string) => {
     if (categories.find(c => c.name.toLowerCase() === name.toLowerCase())) return;
     const hue = Math.floor(Math.random() * 360);
@@ -104,12 +131,16 @@ export function useTempoStore() {
 
   return {
     records,
+    activeTimers,
     goalPages,
     folders,
     categories,
     addRecord,
     deleteRecord,
     updateRecord,
+    addActiveTimer,
+    deleteActiveTimer,
+    updateActiveTimer,
     setGoalPages,
     setFolders,
     addCategory,
