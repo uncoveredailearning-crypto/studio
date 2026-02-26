@@ -26,7 +26,7 @@ import {
   subMonths,
   addDays,
   subDays,
-  parseISO
+  getDay
 } from "date-fns";
 import { cn } from "@/lib/utils";
 import { 
@@ -80,6 +80,12 @@ export default function InsightsPage() {
 
   const monthEnd = endOfMonth(currentMonthStart);
   const monthDays = eachDayOfInterval({ start: currentMonthStart, end: monthEnd });
+  
+  // Calculate padding for the calendar grid based on the first day of the month
+  // We use weekStartsOn: 1 (Monday)
+  const firstDayOfMonth = startOfMonth(currentMonthStart);
+  const startDayPadding = (getDay(firstDayOfMonth) + 6) % 7;
+  const paddingCells = Array.from({ length: startDayPadding });
 
   const getIntensity = (day: Date) => {
     const dayStr = format(day, "yyyy-MM-dd");
@@ -254,7 +260,7 @@ export default function InsightsPage() {
 
       <Card className="border-none shadow-none bg-muted/20 rounded-[2rem]">
         <CardHeader className="flex flex-row items-center justify-between p-8 pb-4">
-          <CardTitle className="text-2xl font-bold tracking-tight">Heatmap</CardTitle>
+          <CardTitle className="text-2xl font-bold tracking-tight">Activity Calendar</CardTitle>
           <div className="flex items-center gap-4">
             <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
               {format(currentMonthStart, "MMMM yyyy")}
@@ -266,43 +272,55 @@ export default function InsightsPage() {
           </div>
         </CardHeader>
         <CardContent className="p-8 pt-0">
-          <div className="grid grid-cols-7 gap-2 mt-4">
+          <div className="grid grid-cols-7 gap-1 mt-4">
             {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => (
-              <div key={i} className="text-[10px] text-center font-black text-muted-foreground/30 py-1">{d}</div>
+              <div key={i} className="text-[10px] text-center font-black text-muted-foreground/40 py-2">{d}</div>
             ))}
+            
+            {/* Empty padding cells for start of month */}
+            {paddingCells.map((_, i) => (
+              <div key={`padding-${i}`} className="aspect-square" />
+            ))}
+
             {monthDays.map((day, idx) => {
               const intensity = getIntensity(day);
               const isToday = isSameDay(day, new Date());
+              const dayNumber = format(day, "d");
               
               return (
                 <button
                   key={idx}
                   onClick={() => setSelectedDay(day)}
                   className={cn(
-                    "heatmap-cell w-full transition-all duration-300 hover:scale-125",
-                    intensity === 0 && "bg-white/40",
-                    intensity === 1 && "bg-accent/20",
-                    intensity === 2 && "bg-accent/50",
-                    intensity === 3 && "bg-accent",
-                    isToday && "ring-2 ring-foreground ring-offset-2"
+                    "w-full aspect-square rounded-lg flex items-center justify-center text-[10px] font-bold transition-all duration-200 border border-transparent",
+                    intensity === 0 && "bg-white/40 text-muted-foreground/50",
+                    intensity === 1 && "bg-accent/20 text-accent-foreground",
+                    intensity === 2 && "bg-accent/50 text-accent-foreground",
+                    intensity === 3 && "bg-accent text-white",
+                    isToday && "ring-2 ring-primary ring-offset-1 border-primary/20",
+                    "hover:scale-110 active:scale-95 z-10"
                   )}
                   title={format(day, "MMM d")}
-                />
+                >
+                  {dayNumber}
+                </button>
               );
             })}
           </div>
           <div className="flex items-center justify-center gap-3 mt-8">
-            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">Sleepy</span>
-            {[0, 1, 2, 3].map(i => (
-              <div key={i} className={cn(
-                "w-4 h-4 rounded-md",
-                i === 0 && "bg-white",
-                i === 1 && "bg-accent/20",
-                i === 2 && "bg-accent/50",
-                i === 3 && "bg-accent"
-              )} />
-            ))}
-            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">Active</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">Resting</span>
+            <div className="flex gap-1">
+              {[0, 1, 2, 3].map(i => (
+                <div key={i} className={cn(
+                  "w-3 h-3 rounded-sm",
+                  i === 0 && "bg-white border border-border/20",
+                  i === 1 && "bg-accent/20",
+                  i === 2 && "bg-accent/50",
+                  i === 3 && "bg-accent"
+                )} />
+              ))}
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">Peak</span>
           </div>
         </CardContent>
       </Card>
