@@ -1,4 +1,5 @@
 import type {Metadata, Viewport} from 'next';
+import Script from 'next/script';
 import './globals.css';
 import { BottomNav } from '@/components/layout/bottom-nav';
 
@@ -42,6 +43,29 @@ export default function RootLayout({
           {children}
         </main>
         <BottomNav />
+        <Script
+          id="remove-vercel-toolbar"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const observer = new MutationObserver(() => {
+                  const elements = [
+                    'vercel-live-feedback',
+                    '#vercel-live-feedback',
+                    '.vercel-toolbar-root',
+                    '#vercel-toolbar-root'
+                  ];
+                  elements.forEach(selector => {
+                    const el = document.querySelector(selector);
+                    if (el) el.style.display = 'none';
+                  });
+                });
+                observer.observe(document.documentElement, { childList: true, subtree: true });
+              })();
+            `,
+          }}
+        />
       </body>
     </html>
   );

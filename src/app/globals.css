@@ -66,3 +66,12 @@
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
+
+/* Hide Vercel Toolbar */
+vercel-live-feedback,
+#vercel-live-feedback,
+.vercel-toolbar-root,
+#vercel-toolbar-root,
+[data-vercel-toolbar] {
+  display: none !important;
+}
