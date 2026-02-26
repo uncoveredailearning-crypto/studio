@@ -68,7 +68,7 @@ export default function TimersPage() {
           </div>
           <div>
             <h1 className="text-4xl tracking-tight font-extrabold">Tempo</h1>
-            <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest mt-1">Live Sessions</p>
+            <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest mt-1">track your time</p>
           </div>
         </div>
         <div className="flex gap-2">
