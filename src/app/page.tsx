@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Plus, Play, Pause, RotateCcw, Save, Zap, Timer } from "lucide-react";
+import { Plus, Play, Pause, RotateCcw, Save, Zap, Timer as TimerIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
@@ -10,15 +10,21 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { useTempoStore } from "@/lib/store";
 
 export default function TimersPage() {
-  const [timers, setTimers] = useState<any[]>([]);
+  const { addRecord, addCategory, categories } = useTempoStore();
+  const [activeTimers, setActiveTimers] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTimer, setNewTimer] = useState({ name: "", category: "Work" });
   const { toast } = useToast();
 
   const addRegularTimer = () => {
-    if (!newTimer.name) return;
+    if (!newTimer.name) {
+      toast({ title: "Name required", variant: "destructive" });
+      return;
+    }
+    addCategory(newTimer.category);
     const timer = {
       id: Date.now().toString(),
       name: newTimer.name,
@@ -26,9 +32,8 @@ export default function TimersPage() {
       type: "regular",
       seconds: 0,
       isRunning: false,
-      lastTick: null,
     };
-    setTimers([timer, ...timers]);
+    setActiveTimers([timer, ...activeTimers]);
     setIsModalOpen(false);
     setNewTimer({ name: "", category: "Work" });
   };
@@ -41,10 +46,23 @@ export default function TimersPage() {
       type: "sports",
       ms: 0,
       isRunning: true,
-      lastTick: Date.now(),
     };
-    setTimers([timer, ...timers]);
+    setActiveTimers([timer, ...activeTimers]);
     toast({ title: "Sports timer started" });
+  };
+
+  const handleSave = (id: string, data: any) => {
+    addRecord({
+      name: data.name,
+      category: data.category,
+      duration: data.type === 'regular' ? data.time : Math.floor(data.time / 1000),
+      ms: data.type === 'sports' ? data.time : undefined,
+      date: new Date().toISOString().split('T')[0],
+      folder: 'Unsorted',
+      type: data.type,
+    });
+    setActiveTimers(prev => prev.filter(t => t.id !== id));
+    toast({ title: "Session saved to Archive" });
   };
 
   return (
@@ -75,17 +93,18 @@ export default function TimersPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="category">Category</Label>
-                  <Select value={newTimer.category} onValueChange={(val) => setNewTimer({...newTimer, category: val})}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Work">Work</SelectItem>
-                      <SelectItem value="Fitness">Fitness</SelectItem>
-                      <SelectItem value="Reading">Reading</SelectItem>
-                      <SelectItem value="Personal">Personal</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Input placeholder="Type category..." value={newTimer.category} onChange={(e) => setNewTimer({...newTimer, category: e.target.value})} />
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {categories.slice(0, 4).map(c => (
+                      <button 
+                        key={c.name} 
+                        onClick={() => setNewTimer({...newTimer, category: c.name})}
+                        className="text-[10px] uppercase px-2 py-1 bg-muted rounded hover:bg-muted/80 transition-colors"
+                      >
+                        {c.name}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
               <DialogFooter>
@@ -97,18 +116,19 @@ export default function TimersPage() {
       </header>
 
       <section className="space-y-4">
-        {timers.length === 0 ? (
+        {activeTimers.length === 0 ? (
           <div className="h-64 flex flex-col items-center justify-center text-muted-foreground border-2 border-dashed border-border rounded-xl">
-            <Timer className="w-12 h-12 opacity-20 mb-4" />
+            <TimerIcon className="w-12 h-12 opacity-20 mb-4" />
             <p className="font-medium">No active timers</p>
             <p className="text-xs uppercase tracking-tighter">Start your first session above</p>
           </div>
         ) : (
-          timers.map((timer) => (
+          activeTimers.map((timer) => (
             <TimerCard 
               key={timer.id} 
               timer={timer} 
-              onDelete={() => setTimers(timers.filter(t => t.id !== timer.id))}
+              onDelete={() => setActiveTimers(activeTimers.filter(t => t.id !== timer.id))}
+              onSave={(time) => handleSave(timer.id, { ...timer, time })}
             />
           ))
         )}
@@ -117,7 +137,7 @@ export default function TimersPage() {
   );
 }
 
-function TimerCard({ timer, onDelete }: { timer: any; onDelete: () => void }) {
+function TimerCard({ timer, onDelete, onSave }: { timer: any; onDelete: () => void; onSave: (time: number) => void }) {
   const [time, setTime] = useState(timer.type === 'regular' ? timer.seconds : timer.ms);
   const [isRunning, setIsRunning] = useState(timer.isRunning);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -164,7 +184,7 @@ function TimerCard({ timer, onDelete }: { timer: any; onDelete: () => void }) {
             <Button variant="ghost" size="icon" onClick={() => setTime(0)} className="h-8 w-8">
               <RotateCcw className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={onDelete} className="h-8 w-8 text-destructive hover:bg-destructive/10">
+            <Button variant="ghost" size="icon" onClick={() => onSave(time)} className="h-8 w-8 text-primary hover:bg-primary/10">
               <Save className="w-4 h-4" />
             </Button>
           </div>
