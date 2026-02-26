@@ -97,14 +97,23 @@ export default function InsightsPage() {
   };
 
   const dailyDateStr = format(currentDailyDate, "yyyy-MM-dd");
-  const dailyRecords = records
-    .filter(r => r.date === dailyDateStr)
-    .map(r => ({
-      name: r.name,
-      hours: r.duration / 3600,
-      category: r.category,
-      color: categories.find(c => c.name === r.category)?.color || 'hsl(var(--primary))'
-    }));
+
+  // Group daily records by category
+  const dailyRecordsRaw = records.filter(r => r.date === dailyDateStr);
+  const groupedByCategory = dailyRecordsRaw.reduce((acc, r) => {
+    if (!acc[r.category]) {
+      acc[r.category] = {
+        name: r.category,
+        hours: 0,
+        category: r.category,
+        color: categories.find(c => c.name === r.category)?.color || 'hsl(var(--primary))'
+      };
+    }
+    acc[r.category].hours += (r.duration / 3600);
+    return acc;
+  }, {} as Record<string, any>);
+
+  const dailyRecords = Object.values(groupedByCategory);
 
   const handleManualEntry = () => {
     if (!manualEntry.name) return;

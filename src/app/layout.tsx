@@ -9,10 +9,16 @@ export const metadata: Metadata = {
   icons: {
     icon: '/icon.svg',
     apple: '/icon.svg',
+    other: [
+      {
+        rel: 'apple-touch-icon',
+        url: '/icon.svg',
+      },
+    ],
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'Tempo',
   },
 };

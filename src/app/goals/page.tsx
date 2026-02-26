@@ -112,17 +112,17 @@ export default function GoalsPage() {
 
   return (
     <div className="space-y-8 fade-in flex flex-col min-h-[calc(100vh-10rem)]">
-      <header className="flex justify-between items-end">
-        <div className="flex items-center gap-4">
-          <div className="relative w-12 h-12 rounded-2xl overflow-hidden shadow-lg shadow-accent/20">
+      <header className="flex justify-between items-end px-1 sm:px-0">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-2xl overflow-hidden shadow-lg shadow-accent/20">
             <Image src="/icon.svg" alt="Tempo Logo" fill className="object-cover" />
           </div>
           <div>
-            <h1 className="text-4xl tracking-tight font-extrabold">Aspirations</h1>
-            <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest mt-1">Goal Trajectory</p>
+            <h1 className="text-3xl sm:text-4xl tracking-tight font-extrabold">Aspirations</h1>
+            <p className="text-muted-foreground text-[10px] sm:text-xs font-bold uppercase tracking-widest mt-0.5 sm:mt-1">Goal Trajectory</p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-1.5 sm:gap-2">
           <Button variant="ghost" size="icon" className="rounded-2xl bg-muted/30" onClick={() => setIsHistoryModalOpen(true)}>
             <History className="w-5 h-5" />
           </Button>
@@ -195,37 +195,39 @@ export default function GoalsPage() {
           )}
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4 w-full justify-center">
           <Button 
             variant="outline" size="icon" 
-            className="rounded-[1.2rem] h-14 w-14 border-border bg-white shadow-sm hover:bg-muted"
+            className="rounded-[1.1rem] h-12 w-12 sm:h-14 sm:w-14 shrink-0 border-border bg-white shadow-sm hover:bg-muted"
             onClick={() => setActivePageIndex(prev => (prev > 0 ? prev - 1 : goalPages.length - 1))}
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
           </Button>
           
-          <Button 
-            className="rounded-2xl px-10 h-16 bg-primary text-primary-foreground shadow-xl shadow-primary/20 gap-3 font-bold text-lg"
-            onClick={() => setIsNewGoalModalOpen(true)}
-          >
-            <Plus className="w-5 h-5" />
-            Add Goal
-          </Button>
-          
-          <Button 
-            className="rounded-2xl px-10 h-16 bg-accent text-accent-foreground shadow-xl shadow-accent/20 gap-3 font-bold text-lg"
-            onClick={handleSnapshot}
-          >
-            <Sparkles className="w-5 h-5" />
-            Snapshot
-          </Button>
+          <div className="flex gap-2 flex-1 max-w-[320px]">
+            <Button
+              className="rounded-2xl px-0 sm:px-10 h-14 sm:h-16 flex-1 bg-primary text-primary-foreground shadow-xl shadow-primary/20 gap-2 sm:gap-3 font-bold text-sm sm:text-lg"
+              onClick={() => setIsNewGoalModalOpen(true)}
+            >
+              <Plus className="w-4 h-4 sm:w-5 h-5" />
+              <span className="truncate">Add Goal</span>
+            </Button>
+
+            <Button
+              className="rounded-2xl px-0 sm:px-10 h-14 sm:h-16 flex-1 bg-accent text-accent-foreground shadow-xl shadow-accent/20 gap-2 sm:gap-3 font-bold text-sm sm:text-lg"
+              onClick={handleSnapshot}
+            >
+              <Sparkles className="w-4 h-4 sm:w-5 h-5" />
+              <span className="truncate">Snapshot</span>
+            </Button>
+          </div>
 
           <Button 
             variant="outline" size="icon" 
-            className="rounded-[1.2rem] h-14 w-14 border-border bg-white shadow-sm hover:bg-muted"
+            className="rounded-[1.1rem] h-12 w-12 sm:h-14 sm:w-14 shrink-0 border-border bg-white shadow-sm hover:bg-muted"
             onClick={() => setActivePageIndex(prev => (prev < goalPages.length - 1 ? prev + 1 : 0))}
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </Button>
         </div>
       </div>
