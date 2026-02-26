@@ -1,12 +1,15 @@
 import type {Metadata, Viewport} from 'next';
 import './globals.css';
 import { BottomNav } from '@/components/layout/bottom-nav';
-import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
   title: 'Tempo | Precision Timing',
   description: 'A minimalist high-end time tracking and productivity app.',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/icon.svg',
+    apple: '/icon.svg',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -39,7 +42,6 @@ export default function RootLayout({
           {children}
         </main>
         <BottomNav />
-        <Toaster />
       </body>
     </html>
   );

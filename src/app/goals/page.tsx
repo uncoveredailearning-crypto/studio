@@ -2,11 +2,11 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight, Sparkles, Plus, Trash2, Edit2, History, Clock, MoreHorizontal } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useTempoStore, Goal, GoalPage } from "@/lib/store";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
@@ -26,8 +26,6 @@ export default function GoalsPage() {
   const [newGoal, setNewGoal] = useState<Partial<Goal>>({ title: "", target: 0, period: "daily" });
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [editingCollectionTitle, setEditingCollectionTitle] = useState("");
-  
-  const { toast } = useToast();
 
   const activePage = goalPages[activePageIndex] || goalPages[0];
 
@@ -88,7 +86,6 @@ export default function GoalsPage() {
     const updatedPages = [...goalPages];
     updatedPages[activePageIndex].goals = updatedPages[activePageIndex].goals.filter(g => g.id !== goalId);
     setGoalPages(updatedPages);
-    toast({ title: "Goal Removed" });
   };
 
   const updateCollectionTitle = () => {
@@ -111,18 +108,19 @@ export default function GoalsPage() {
         type: 'regular'
       });
     });
-    toast({
-      title: "Snapshot Captured",
-      description: "Current goal progress logged to the Archive.",
-    });
   };
 
   return (
     <div className="space-y-8 fade-in flex flex-col min-h-[calc(100vh-10rem)]">
       <header className="flex justify-between items-end">
-        <div>
-          <h1 className="text-4xl tracking-tight font-extrabold">Aspirations</h1>
-          <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest mt-1">Goal Trajectory</p>
+        <div className="flex items-center gap-4">
+          <div className="relative w-12 h-12 rounded-2xl overflow-hidden shadow-lg shadow-accent/20">
+            <Image src="/icon.svg" alt="Tempo Logo" fill className="object-cover" />
+          </div>
+          <div>
+            <h1 className="text-4xl tracking-tight font-extrabold">Aspirations</h1>
+            <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest mt-1">Goal Trajectory</p>
+          </div>
         </div>
         <div className="flex gap-2">
           <Button variant="ghost" size="icon" className="rounded-2xl bg-muted/30" onClick={() => setIsHistoryModalOpen(true)}>

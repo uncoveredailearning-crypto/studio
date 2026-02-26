@@ -8,14 +8,9 @@
   "theme_color": "#FFFFFF",
   "icons": [
     {
-      "src": "https://placehold.co/192x192/1C1C1E/FFFFFF/png?text=T",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://placehold.co/512x512/1C1C1E/FFFFFF/png?text=Tempo",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
     }
   ]
 }
