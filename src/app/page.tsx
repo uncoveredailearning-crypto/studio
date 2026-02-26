@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { Plus, Play, Pause, RotateCcw, Save, Zap, Timer as TimerIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useTempoStore, ActiveTimer } from "@/lib/store";
 
@@ -15,13 +15,11 @@ export default function TimersPage() {
   const { addRecord, addCategory, categories, activeTimers, addActiveTimer, deleteActiveTimer, updateActiveTimer, isLoaded } = useTempoStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTimer, setNewTimer] = useState({ name: "", category: "Work" });
-  const { toast } = useToast();
 
   if (!isLoaded) return null;
 
   const addRegularTimer = () => {
     if (!newTimer.name) {
-      toast({ title: "Name required", variant: "destructive" });
       return;
     }
     addCategory(newTimer.category);
@@ -46,7 +44,6 @@ export default function TimersPage() {
       startTime: Date.now(),
       isRunning: true,
     });
-    toast({ title: "Sports timer started" });
   };
 
   const handleSave = (timer: ActiveTimer, currentMs: number) => {
@@ -60,15 +57,19 @@ export default function TimersPage() {
       type: timer.type,
     });
     deleteActiveTimer(timer.id);
-    toast({ title: "Session saved to Archive" });
   };
 
   return (
     <div className="space-y-8 fade-in">
       <header className="flex justify-between items-end">
-        <div>
-          <h1 className="text-4xl tracking-tight font-extrabold">Tempo</h1>
-          <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest mt-1">Live Sessions</p>
+        <div className="flex items-center gap-4">
+          <div className="relative w-12 h-12 rounded-2xl overflow-hidden shadow-lg shadow-primary/20">
+            <Image src="/icon.svg" alt="Tempo Logo" fill className="object-cover" />
+          </div>
+          <div>
+            <h1 className="text-4xl tracking-tight font-extrabold">Tempo</h1>
+            <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest mt-1">Live Sessions</p>
+          </div>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="icon" onClick={addSportsTimer} className="rounded-2xl h-12 w-12 border-accent/20 text-accent hover:bg-accent/10">
